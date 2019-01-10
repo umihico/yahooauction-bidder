@@ -1,19 +1,18 @@
 import itertools
 import os
-import selenium as _selenium
-from selenium.webdriver import Chrome as _Chrome
-_Chrome.xpath = _Chrome.find_element_by_xpath
-_Chrome.xpaths = _Chrome.find_elements_by_xpath
-from time import sleep as _sleep
-import codecs as _codecs
-import ast as _ast
-from pprint import pformat as _pformat
+from selenium.webdriver import Chrome
+Chrome.xpath = Chrome.find_element_by_xpath
+Chrome.xpaths = Chrome.find_elements_by_xpath
+from time import sleep
+import codecs
+import ast
+from pprint import pformat
 
 cookie_filename = os.path.join(os.path.dirname(
     os.path.abspath(__file__)), 'cookie.txt')
 
 
-class LoggedinChrome(_Chrome):
+class LoggedinChrome(Chrome):
     """provides logined chrome"""
 
     def __init__(self, username=None, password=None, executable_path="chromedriver", port=0, options=None, service_args=None, desired_capabilities=None, service_log_path=None, chrome_options=None):
@@ -39,7 +38,7 @@ class LoggedinChrome(_Chrome):
             except Exception as e:
                 if try_time > 100:
                     raise
-                _sleep(0.1)
+                sleep(0.1)
             else:
                 break
         self.xpath("//button[@id='btnSubmit']").click()
@@ -54,16 +53,16 @@ class LoggedinChrome(_Chrome):
 
     def _load_cookie(self):
         try:
-            with _codecs.open(cookie_filename, 'r', 'utf-8') as f:
-                cookies = _ast.literal_eval(f.read())
+            with codecs.open(cookie_filename, 'r', 'utf-8') as f:
+                cookies = ast.literal_eval(f.read())
         except FileNotFoundError as e:
             cookies = list()
         return cookies
 
     def _save_cookie(self):
         cookies = self.get_cookies()
-        with _codecs.open(cookie_filename, 'w', 'utf-8') as f:
-            f.write(_pformat(cookies))
+        with codecs.open(cookie_filename, 'w', 'utf-8') as f:
+            f.write(pformat(cookies))
 
 
 def test():
