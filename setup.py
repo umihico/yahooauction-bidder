@@ -36,7 +36,7 @@ setup(
     author_email=f'{USERNAME}@users.noreply.github.com',
     license='MIT',
     keywords=' '.join(topics),
-    packages=find_packages(),
+    packages=find_packages(exclude=["stdin_credential"]),
     install_requires=requirements,
     classifiers=[
         'Programming Language :: Python :: 3.6',
