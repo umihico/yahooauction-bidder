@@ -4,7 +4,7 @@ import traceback
 from selenium.webdriver.common.keys import Keys
 
 
-def bid(self, url, price):
+def bid(self, url, price, practice=False):
     try:
         self.get(url)
         self.xpath(
@@ -19,8 +19,13 @@ def bid(self, url, price):
                                               "//p[contains(@class,'BidModal__error') and contains(@style,'block')]")
         if msg_if_error:
             return False, msg_if_error
-        self.xpath(
-            "//div[@class='SubmitBox']/input[@class='SubmitBox__button SubmitBox__button--bid']").click()
+        final_bid_button_xpath = "//div[@class='SubmitBox']/input[@class='SubmitBox__button SubmitBox__button--bid']"
+        if practice:
+            if self.xpaths(final_bid_button_xpath):
+                return True, "テスト成功"
+            else:
+                return False, "テスト失敗"
+        self.xpath(final_bid_button_xpath).click()
         msg_if_error = element_texts_if_exist(self, "//div[@class='NgAttention']")
         if msg_if_error:
             return False, msg_if_error
