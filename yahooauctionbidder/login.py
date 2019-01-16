@@ -2,6 +2,7 @@ import itertools
 import os
 import sys
 from selenium.webdriver import Chrome
+from ppickle import dump, load
 Chrome.xpath = Chrome.find_element_by_xpath
 Chrome.xpaths = Chrome.find_elements_by_xpath
 from time import sleep
@@ -21,7 +22,7 @@ class LoggedinChrome(Chrome):
         if not self._logined():
             self._login_by_cookie()
         self.refresh()
-        if not self._logined():
+        if username and password and not self._logined():
             self._login_by_credential(username, password)
         self._save_cookie()
 
@@ -66,13 +67,11 @@ class LoggedinChrome(Chrome):
 
     def _load_cookie(self):
         try:
-            with codecs.open(cookie_filename, 'r', 'utf-8') as f:
-                cookies = ast.literal_eval(f.read())
+            cookies = load(cookie_filename)
         except FileNotFoundError as e:
             cookies = list()
         return cookies
 
     def _save_cookie(self):
         cookies = self.get_cookies()
-        with codecs.open(cookie_filename, 'w', 'utf-8') as f:
-            f.write(pformat(cookies))
+        dump(cookie_filename, cookies)
