@@ -3,40 +3,58 @@ import requests
 import os
 USERNAME = "umihico"
 REPONAME = os.path.split(os.path.dirname(os.path.abspath(__file__)))[-1]
+GITHUB_API_URL = f"https://api.github.com/repos/{USERNAME}/{REPONAME}"
 
 
-github_api_url = f"https://api.github.com/repos/{USERNAME}/{REPONAME}"
-description = requests.get(github_api_url).json()['description']
-topics = requests.get(github_api_url + "/topics", headers={
-    "Accept": "application/vnd.github.mercy-preview+json", }).json()['names']
 requirements = [
-    "selenium",
+
 ]
 
 
-def _version_increment():
-    with open('version_texts/version_raw.txt', 'r') as f:
-        version = int(float(f.read()))
-    version += 1
-    version = str(version)
-    with open('version_texts/version_raw.txt', 'w') as f:
-        f.write(version)
-    version = '.'.join(str(version).zfill(3))
-    with open('version_texts/version_digitgood.txt', 'w') as f:
-        f.write(version)
-    return version
+def get_description():
+    description = requests.get(GITHUB_API_URL).json()['description']
+    return description
 
 
+def get_topic():
+    topics = requests.get(GITHUB_API_URL + "/topics", headers={
+        "Accept": "application/vnd.github.mercy-preview+json", }).json()['names']
+    return ' '.join(topics)
+
+
+def increment_version():
+    filename = 'version.txt'
+    with open(filename, 'r') as f:
+        raw_version = f.read()  # 0.0.3
+    int_version = int(raw_version.replace('.', ''))  # 3
+    int_version += 1
+    new_version = '.'.join(str(int_version).zfill(3))  # 0.0.4
+    with open(filename, 'w') as f:
+        f.write(new_version)
+    return new_version
+
+
+def get_long_description():
+    with open('README.md', 'r', encoding='utf-8') as f:
+        long_description = f.read()
+
+
+description = get_description()
+keywords = get_topic()
+version = increment_version()
+long_description = get_long_description()
 setup(
     name=REPONAME,
-    version=_version_increment(),
+    version=version,
     description=description,
+    long_description=long_description,
+    long_description_content_type='text/markdown',
     url=f'https://github.com/{USERNAME}/{REPONAME}',
     author=USERNAME,
     author_email=f'{USERNAME}@users.noreply.github.com',
     license='MIT',
-    keywords=' '.join(topics),
-    packages=find_packages(exclude=["stdin_credential"]),
+    keywords=keywords,
+    packages=find_packages(),
     install_requires=requirements,
     classifiers=[
         'Programming Language :: Python :: 3.6',
